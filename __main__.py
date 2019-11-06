@@ -12,19 +12,23 @@ app = Flask(__name__)
 
 @app.route('/api/v1/customers', methods=['GET'])
 def customers():
-    return Customer.listCostomers()
+    data = Customer.list()
+    return jsonify(data)
 
 
 @app.route('/api/v1/customer/<cpf>', methods=['GET'])
 def customerByCPF(cpf):
-    return Customer.getCostomerByCPF(cpf)
+    data = Customer.get_customer_by_cpf(cpf)
+    return jsonify(data)
 
 
 @app.route('/api/v1/new_customer', methods=['POST'])
 def newCustomer():
-    customer = Customer(request.form['name'], request.form['email'], request.form['cpf'], request.form['address'], request.form['phone'])
+    print(request.json)
+    req_data = request.get_json()
+    customer = Customer(req_data['name'], req_data['email'], req_data['cpf'], req_data['address'], req_data['phone'])
     customer.save()
-    return request.form['name']
+    return customer.cpf + " cadastrado"
 
 
 if __name__ == '__main__':
