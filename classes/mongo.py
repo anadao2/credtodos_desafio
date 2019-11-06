@@ -9,9 +9,6 @@ class Mongo:
     def __init__(self):
         self._client = MongoClient('localhost', 27017)
         self._db = self._client.credtodos
-        # wallet = self._db.wallet
-        # serverStatusResult = self._db.command("serverStatus")
-        # pprint(serverStatusResult)
 
     @property
     def db(self):
