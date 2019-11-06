@@ -65,3 +65,5 @@ Boa sorte,
 PagTodos e CredTodos!
 
 ![Luck](https://media.tenor.com/images/e026ce9d75219c8d82277ddf0558ee2b/tenor.gif)
+
+curl -d '{"name":"Bla", "email":"bla@gmail.com", "cpf":"00000000000", "address":"R. Trajano Reis, 185", "phone":"16982487578"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/api/v1/new_customer
