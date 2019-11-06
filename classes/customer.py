@@ -1,4 +1,7 @@
-from datetime import datetime
+import datetime
+
+from bson import ObjectId
+from flask import jsonify
 
 from classes.address import Address
 from classes.mongo import Mongo
@@ -63,16 +66,18 @@ class Customer:
         }
         db = Mongo()
         db = db.db
-        print(customer)
         wallet = db.wallet
         wallet.insert_one(customer)
 
-    @classmethod
-    def listCostomers(cls):
+    @staticmethod
+    def list():
         db = Mongo()
         db = db.db
-        #print(db)
         wallet = db.wallet
+        return list(wallet.find())
 
-        for x in wallet.find():
-            print(x)
+    def get_customer_by_cpf(cpf):
+        db = Mongo()
+        db = db.db
+        print(db.wallet.find_one({"_id": cpf}))
+        return db.wallet.find_one({"_id": cpf})
