@@ -1,9 +1,9 @@
 import datetime
 
 import phonenumbers
+from bson.json_util import dumps
 from validate_email import validate_email
 
-from classes import cpf
 from classes.address import Address
 from classes.mongo import Mongo
 
@@ -62,22 +62,27 @@ class Customer:
         db = Mongo()
         db = db.db
         wallet = db.wallet
-        wallet.insert_one(self.template())
+        x=wallet.insert_one(self.template())
 
     def validate(self):
+        # NAME
+        if not self.name:
+            raise Exception('Nome deve ser inserido')
+
         # EMAIL
-        is_valid_email = validate_email(self.email)
+        if not validate_email(self.email):
+            raise Exception('Email invalido')
 
         # CPF
-        is_valid_cpf = cpf.isCpfValid(self.cpf)
+        if not is_cpf_valid(self.cpf):
+            raise Exception('CPF invalido')
 
         # PHONE
-        is_valid_phone = phonenumbers.parse("+55" + self.phone, None)
+        phone = phonenumbers.parse("+55" + self.phone, None)
+        if not phonenumbers.is_valid_number(phone):
+            raise Exception('Telefone invalido')
 
-        if is_valid_email and is_valid_cpf and is_valid_phone and self.address.validate():
-            return false
-
-
+        self.address.validate()
 
     def template(self):
         cus = {
@@ -91,15 +96,75 @@ class Customer:
         return cus
 
     @staticmethod
+    def dbload(json):
+        print(json)
+        x=Customer(json ['name'], json ['email'],json ['id'],json ['address'],json ['phone'])
+        print(x.name)
+
+
+    @staticmethod
     def list():
         db = Mongo()
         db = db.db
         wallet = db.wallet
-        print(wallet.find())
-        return list(wallet.find())
+        list = []
+        for x in wallet.find():
+            list.append(Customer.dbload(x))
+
+        print(list)
+        return list
 
     def get_customer_by_cpf(cpf):
         db = Mongo()
         db = db.db
         print(db.wallet.find_one({"_id": cpf}))
         return db.wallet.find_one({"_id": cpf})
+
+import re
+
+def is_cpf_valid(cpf):
+    # Check if type is str
+    if not isinstance(cpf,str):
+        return False
+
+    # Remove some unwanted characters
+    cpf = re.sub("[^0-9]",'',cpf)
+
+    # Checks if string has 11 characters
+    if len(cpf) != 11:
+        return False
+
+    sum = 0
+    weight = 10
+
+    for n in range(9):
+        sum = sum + int(cpf[n]) * weight
+
+        # Decrement weight
+        weight = weight - 1
+
+    verifying_digit = 11 -  sum % 11
+
+    if verifying_digit > 9 :
+        firstverifying_digit = 0
+    else:
+        firstverifying_digit = verifying_digit
+
+    sum = 0
+    weight = 11
+    for n in range(10):
+        sum = sum + int(cpf[n]) * weight
+
+        # Decrement weight
+        weight = weight - 1
+
+    verifying_digit = 11 -  sum % 11
+
+    if verifying_digit > 9 :
+        secondverifying_digit = 0
+    else:
+        secondverifying_digit = verifying_digit
+
+    if cpf[-2:] == "%s%s" % (firstverifying_digit,secondverifying_digit):
+        return True
+    return False

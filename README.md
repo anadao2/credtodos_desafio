@@ -74,4 +74,8 @@ pip install py3dns
 
 https://github.com/rafahlobo/cpfValidator/blob/
 
+https://blog.miguelgrinberg.com/post/restful-authentication-with-flask
+
+https://medium.com/@boscacci/why-and-how-to-make-a-requirements-txt-f329c685181e
+
 

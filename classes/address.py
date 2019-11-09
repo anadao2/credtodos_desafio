@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
+import urllib.request, json
+
+
 class Address:
-    def __init__(self, cep, place, complement):
+    def __init__(self, cep, number, complement):
         self._cep = cep
         self._complement = complement
-        self._place = place
+        self._number = int(number)
         self._city = ""
+        self._street = ""
         self._state = ""
         self._ibge = ""
         self._gia = ""
-        self._unit = ""
+        self._district = ""
 
     @property
     def cep(self):
@@ -27,12 +31,12 @@ class Address:
         self._complement = complement
 
     @property
-    def place(self):
-        return self._place
+    def number(self):
+        return self._number
 
-    @place.setter
-    def place(self, place):
-        self._place = place
+    @number.setter
+    def number(self, number):
+        self._number = int(number)
 
     @property
     def district(self):
@@ -47,8 +51,8 @@ class Address:
         return self._city
 
     @city.setter
-    def district(self, city):
-        self._city= city
+    def city(self, city):
+        self._city=city
 
     @property
     def state(self):
@@ -72,29 +76,45 @@ class Address:
 
     @gia.setter
     def gia(self, gia):
-        self._gia= gia
+        self._gia = gia
 
     @property
-    def unit(self):
-        return self._unit
+    def street(self):
+        return self._street
 
-    @unit.setter
-    def unit(self, unit):
-        self._unit = unit
+    @street.setter
+    def street(self, street):
+        self._street = street
 
     def validate(self):
-        "https://viacep.com.br/ws/11030904/json"
-        # NUMERO e COMPLEMENTO não obrigatório
+        # CEP
+        if not self.cep:
+            raise Exception('CEP deve ser inserido')
+
+        self.autocomplete()
+
+    def autocomplete(self):
+        with urllib.request.urlopen("https://viacep.com.br/ws/" + self.cep + "/json") as url:
+            data = json.loads(url.read().decode())
+            print(data['localidade'])
+            self._city=data['localidade']
+            self._district=data['bairro']
+            self._state=data['uf']
+            self._street=data['logradouro']
+            self._ibge=data['ibge']
+            self._gia=data['gia']
+            print(self.template())
+
+
     def template(self):
         add = {
             "cep": self.cep,
             "complement": self.complement,
-            "place": self.place,
+            "number": self.number,
             "city": self.city,
             "state": self.state,
             "ibge": self.ibge,
-            "ibge": self.gia,
-            "unit": self.unit
+            "gia": self.gia
         }
 
         return add
