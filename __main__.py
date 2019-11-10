@@ -1,18 +1,33 @@
 import json
+import os
 
-import jsons
 import pymongo
-from flask import Flask, jsonify, request
+from flask import Flask, request
 from flask_api import status
+from flask_httpauth import HTTPTokenAuth
+from werkzeug.security import check_password_hash
 
 from classes.address import Address
 from classes.customer import Customer
-import os
 
 app = Flask(__name__)
+auth = HTTPTokenAuth(scheme='Token')
+
+tokens = {
+    "ac5f34261aaa980f75f5571a6439f6a0": "credtodos_backend"
+}
+
+
+@auth.verify_token
+def verify_token(token):
+    if token in tokens:
+        current_user = tokens[token]
+        return True
+    return False
 
 
 @app.route('/api/v1/customers', methods=['GET'])
+@auth.login_required
 def customers():
     try:
         data = Customer.list()
@@ -26,6 +41,7 @@ def customers():
 
 
 @app.route('/api/v1/customer/<cpf>', methods=['GET'])
+@auth.login_required
 def customerByCPF(cpf):
     try:
         data = Customer.get_customer_by_cpf(cpf)
@@ -39,6 +55,7 @@ def customerByCPF(cpf):
 
 
 @app.route('/api/v1/new_customer', methods=['POST'])
+@auth.login_required
 def newCustomer():
     status_code = ""
     content = ""

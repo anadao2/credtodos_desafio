@@ -67,6 +67,7 @@ PagTodos e CredTodos!
 ![Luck](https://media.tenor.com/images/e026ce9d75219c8d82277ddf0558ee2b/tenor.gif)
 
 curl -d '{"nome":"Bla", "email":"bla@gmail.com", "cpf":"00000000000", "cep":"05541030", "numero":"185","complemento":"Bloco 7, apto 115","telefone":"16982487578"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/api/v1/new_customer
+curl -H 'Accept: application/json' -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" http://127.0.0.1:5000/a pi/v1/customers
 
 https://pypi.org/project/validate_email/
 
@@ -78,4 +79,5 @@ https://blog.miguelgrinberg.com/post/restful-authentication-with-flask
 
 https://medium.com/@boscacci/why-and-how-to-make-a-requirements-txt-f329c685181e
 
+pip install -r requirements.txt
 
