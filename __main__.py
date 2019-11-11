@@ -1,14 +1,13 @@
 import json
 import os
 
+import jsonpickle as jsonpickle
 import pymongo
 from flask import Flask, request
 from flask_api import status
 from flask_httpauth import HTTPTokenAuth
-from werkzeug.security import check_password_hash
 
-from classes.address import Address
-from classes.customer import Customer
+from controller.api import customer_list, save_customer, req_to_customer, get_customer_by_email
 
 app = Flask(__name__)
 auth = HTTPTokenAuth(scheme='Token')
@@ -29,47 +28,48 @@ def verify_token(token):
 @app.route('/api/v1/customers', methods=['GET'])
 @auth.login_required
 def customers():
+    data = ""
     try:
-        data = Customer.list()
+        data = customer_list()
         status_code = status.HTTP_200_OK
 
     except Exception as ex:
         content = {'message': ex.args}
         status_code = status.HTTP_404_NOT_FOUND
 
-    return json.dumps(data), status_code, {'ContentType': 'application/json'}
+    return json.dumps(json.loads(jsonpickle.encode(data)), indent=4, ensure_ascii=False), status_code, {
+        'ContentType': 'application/json'}
 
 
-@app.route('/api/v1/customer/<cpf>', methods=['GET'])
+@app.route('/api/v1/customer/<email>', methods=['GET'])
 @auth.login_required
-def customerByCPF(cpf):
+def customer_by_email(email):
+    data = ""
     try:
-        data = Customer.get_customer_by_cpf(cpf)
+        data = get_customer_by_email(email)
         status_code = status.HTTP_200_OK
 
     except Exception as ex:
         content = {'message': ex.args}
         status_code = status.HTTP_404_NOT_FOUND
 
-    return json.dumps(data), status_code, {'ContentType': 'application/json'}
+    return json.dumps(json.loads(jsonpickle.encode(data)), indent=4, ensure_ascii=False), status_code, {
+        'ContentType': 'application/json'}
 
 
 @app.route('/api/v1/new_customer', methods=['POST'])
 @auth.login_required
-def newCustomer():
+def new_customer():
     status_code = ""
     content = ""
-    req_data = request.get_json()
-
     try:
-        address = Address(req_data['cep'], req_data['numero'], req_data['complemento'])
-        customer = Customer(req_data['nome'], req_data['email'], req_data['cpf'], address, req_data['telefone'])
-        customer.save()
+        customer = req_to_customer(request.get_json())
+        save_customer(customer)
         content = {'message': 'Cadastrado com sucesso'}
         status_code = status.HTTP_201_CREATED
 
     except pymongo.errors.DuplicateKeyError:
-        content = {'message': 'CPF existente'}
+        content = {'message': 'Email existente'}
         status_code = status.HTTP_409_CONFLICT
         # HTTP_500_INTERNAL_SERVER_ERROR
 
