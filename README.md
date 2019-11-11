@@ -1,83 +1,25 @@
-![portaldetodos](https://avatars0.githubusercontent.com/u/56608703?s=400&u=ae31a7a07d28895589b42ed0fcfc102c3d5bccff&v=4)
+Passos de instalação e execução do projeto
 
-Desafio técnico `Python`
-========================
+Instalar o Python 3.8
+Instalar o Mongo 4.2.1
+A aplicação já cria automaticamente a database "credtodos" com a coleção "wallet"
+Instalar todas as dependencias do projeto com:
+ pip install -r requirements.txt
 
-Alguns requisitos
------------------
-  - Deixe o código em inglês;
-  - Use Git;
-  - Procure fazer `micro commits` que são muitos commits com menos código isso nos ajuda a compreender a sua lógica;
-  - Nos pergunte sobre qualquer dúvida que venha a surgir durante o desenvolvimento;
-  - Documente detalhadamente quaisquer referencias/ferramentas que vc pesquisar;
-  - Crie um repositório público e nos passe o link para acompanharmos o desenvolvimento;
-  - Faça testes;
+Rodar aplicação com o comando
+ python __main__.py
 
-Problema
---------
+Os testes de integração rodam com a aplicação up, na porta 5000
+Rodam pela interface do PyCharm e também pelo comando:
+ - python test/integration/api.py
 
-A `CREDTODOS LTDA` está lançando um sistema inovador de cadastros de clientes e precisa garantir toda a qualidade e padronização dos dados.
-E esse sistema será uma `API` simples de cadastro de clientes, e o sistema irá receber no cadastro:
-```shell
-NOME
-EMAIL
-TELEFONE
-CEP
-NUMERO
-COMPLEMENTO
-CPF
-```
 
-Como não é um cadastro qualquer, esses dados precisam passar por uma validação criteriosa e específica:
+#Testes via CURL:
+ curl -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" -d '{"nome":"Bla", "email":"bla@gmail.com", "cpf":"512.825.840-81", "cep":"13710000", "numero":"185","complemento":"Bloco 7, apto 115","telefone":"16982487578"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/api/v1/new_customer
+ curl -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" -d '{"nome":"Bla", "email":"bla@gmail.com", "cpf":"340.907.430-95", "cep":"05541030", "numero":"185","complemento":"Bloco 7, apto 115","telefone":"16982487578"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/api/v1/new_customer
+ curl -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" -d '{"nome":"Bla", "email":"nada@gmail.com", "cpf":"512.825.840-81", "cep":"13710000", "numero":"185","complemento":"Bloco 7, apto 115","telefone":"16982487578"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/api/v1/new_customer
+ curl -H 'Accept: application/json' -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" http://127.0.0.1:5000/a pi/v1/customers
+ curl -H 'Accept: application/json' -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" http://127.0.0.1:5000/api/v1/customer/bla@gmail.com
 
-- EMAIL
-  - Se não existe na base
-  - Pode utilizar via regex, lib ou até api https://verifalia.com/email-verification-api
 
-- TELEFONE
-  - Se é um telefone válido
-  - Existem libs de validação de telefone, por exemplo, https://pypi.org/project/phonenumbers/
-
-- CEP
-  - Verificar se o cep realmente existe
-  - Complementar os dados, utilize algum serviço externo, por exemplo, https://viacep.com.br/ws/11030904/json/
-
-- NUMERO e COMPLEMENTO
-  - não são obrigatórios, mais o número deve ser válido
-
-- CPF
-  - verificar se o valor é válido
-
-A api deve conter basicamente as urls (sugestão):
-```shell
-  GET  /api/v1/customers - listar os clientes
-  GET  /api/v1/customers/`<key>` - detalhe do cliente
-  POST /api/v1/customers - cadastrar um novo cliente
-```
-
-O acesso à api deve ser aberto ao mundo, porém deve possuir autenticação e autorização.
-
-Você está livre para definir a melhor arquitetura e tecnologias para solucionar este desafio, todos os itens descritos nos campos são `sugestões`, mas não se esqueça de contar sua motivação no arquivo README que deve acompanhar sua solução, junto com os detalhes de como executar seu programa. Documentação e testes serão avaliados também =).
-
-Nós solicitamos que você trabalhe no desenvolvimento desse sistema sozinho e não divulgue a solução desse problema pela internet.
-
-Boa sorte,
-PagTodos e CredTodos!
-
-![Luck](https://media.tenor.com/images/e026ce9d75219c8d82277ddf0558ee2b/tenor.gif)
-
-curl -d '{"nome":"Bla", "email":"bla@gmail.com", "cpf":"00000000000", "cep":"05541030", "numero":"185","complemento":"Bloco 7, apto 115","telefone":"16982487578"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/api/v1/new_customer
-curl -H 'Accept: application/json' -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" http://127.0.0.1:5000/a pi/v1/customers
-
-https://pypi.org/project/validate_email/
-
-pip install py3dns
-
-https://github.com/rafahlobo/cpfValidator/blob/
-
-https://blog.miguelgrinberg.com/post/restful-authentication-with-flask
-
-https://medium.com/@boscacci/why-and-how-to-make-a-requirements-txt-f329c685181e
-
-pip install -r requirements.txt
 
