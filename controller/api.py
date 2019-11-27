@@ -9,6 +9,7 @@ from email_validator import validate_email
 from model.classes.address import Address
 from model.classes.customer import Customer
 from model.classes.mongo import Mongo
+from model.schema.customer import CustomerSchema
 
 
 def customer_list():
@@ -46,7 +47,7 @@ def req_to_customer(req_data):
 
 
 def save_customer(customer):
-    validate_customer(customer)
+    #validate_customer(customer)
     db = Mongo()
     db = db.db
     wallet = db.wallet
@@ -59,12 +60,12 @@ def validate_customer(customer):
         raise Exception('Nome deve ser inserido')
 
     # EMAIL
-    if not validate_email(customer.email):
-        raise Exception('Email invalido')
+    #if not validate_email(customer.email):
+    #    raise Exception('Email invalido')
 
     # CPF
-    if not is_cpf_valid(customer.cpf):
-        raise Exception('CPF invalido')
+    #if not is_cpf_valid(customer.cpf):
+    #    raise Exception('CPF invalido')
 
     # PHONE
     phone = phonenumbers.parse("+55" + customer.phone, None)

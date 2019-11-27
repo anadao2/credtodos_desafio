@@ -1,7 +1,7 @@
 Passos de instalação e execução do projeto
 
 - Instalar o Python 3.8
- - Instalar o Mongo 4.2.1
+- Instalar o Mongo 4.2.1
 
 A aplicação já cria automaticamente a database "credtodos" com a coleção "wallet"
 

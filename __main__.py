@@ -6,8 +6,10 @@ import pymongo
 from flask import Flask, request
 from flask_api import status
 from flask_httpauth import HTTPTokenAuth
+from marshmallow import ValidationError
 
 from controller.api import customer_list, save_customer, req_to_customer, get_customer_by_email
+from model.schema.customer import CustomerSchema
 
 app = Flask(__name__)
 auth = HTTPTokenAuth(scheme='Token')
@@ -63,23 +65,22 @@ def new_customer():
     status_code = ""
     content = ""
     try:
-        customer = req_to_customer(request.get_json())
+        # customer = req_to_customer(request.get_json())
+        customer = CustomerSchema().load(request.get_json())
+        schema = CustomerSchema()
+        schema.test_json(customer)
         save_customer(customer)
         content = {'message': 'Cadastrado com sucesso'}
         status_code = status.HTTP_201_CREATED
+
+    except ValidationError as err:
+        content = {'message': err.messages}
+        status_code = status.HTTP_404_NOT_FOUND
 
     except pymongo.errors.DuplicateKeyError:
         content = {'message': 'Email existente'}
         status_code = status.HTTP_409_CONFLICT
         # HTTP_500_INTERNAL_SERVER_ERROR
-
-    except ValueError as ex:
-        content = {'message': 'Numero invalido'}
-        status_code = status.HTTP_404_NOT_FOUND
-
-    except Exception as ex:
-        content = {'message': ex.args}
-        status_code = status.HTTP_404_NOT_FOUND
 
     return json.dumps(content), status_code, {'ContentType': 'application/json'}
 
