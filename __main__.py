@@ -8,7 +8,8 @@ from flask_api import status
 from flask_httpauth import HTTPTokenAuth
 from marshmallow import ValidationError
 
-from controller.api import customer_list, save_customer, req_to_customer, get_customer_by_email
+from controller.api import customer_list, get_customer_by_email
+from model.schema.address import AddressSchema
 from model.schema.customer import CustomerSchema
 
 app = Flask(__name__)
@@ -65,11 +66,10 @@ def new_customer():
     status_code = ""
     content = ""
     try:
-        # customer = req_to_customer(request.get_json())
         customer = CustomerSchema().load(request.get_json())
-        schema = CustomerSchema()
-        schema.test_json(customer)
-        save_customer(customer)
+        address = AddressSchema().load(request.get_json())
+        customer.address = address
+        customer.save()
         content = {'message': 'Cadastrado com sucesso'}
         status_code = status.HTTP_201_CREATED
 
