@@ -1,15 +1,24 @@
 import re
 
 import phonenumbers
-from marshmallow import Schema, fields, validates, ValidationError
+from marshmallow import Schema, fields, validates, ValidationError, EXCLUDE, post_load
 from marshmallow import pprint
+
+from model.classes.customer import Customer
 
 
 class CustomerSchema(Schema):
-    name = fields.Str()
-    email = fields.Email()
-    cpf = fields.Str()
-    phone = fields.Str()
+    class Meta:
+        unknown = EXCLUDE
+
+    @post_load
+    def make_customer(self, data, **kwargs):
+        return Customer(**data)
+
+    name = fields.Str(required=True, error_messages={"required": "Nome deve ser inserido."})
+    email = fields.Email(required=True, error_messages={"required": "Email deve ser inserido."})
+    cpf = fields.Str(required=True, error_messages={"required": "CPF deve ser inserido."})
+    phone = fields.Str(required=True, error_messages={"required": "Telefone deve ser inserido."})
 
     @validates("cpf")
     def validate_cpf(self, value):
