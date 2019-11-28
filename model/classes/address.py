@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-import urllib.request, json
+
+import mongoengine
 
 
-class Address:
-    def __init__(self, cep, number, complement):
-        self.cep = cep
-        self.complement = complement
-        self.number = int(number)
-        self.city = ""
-        self.street = ""
-        self.state = ""
-        self.ibge = ""
-        self.gia = ""
-        self.district = ""
+class Address(mongoengine.EmbeddedDocument):
+    cep = mongoengine.StringField()
+    complement = mongoengine.StringField()
+    number = mongoengine.IntField()
+    city = mongoengine.StringField()
+    street = mongoengine.StringField()
+    state = mongoengine.StringField()
+    ibge = mongoengine.IntField()
+    gia = mongoengine.IntField()
+    district = mongoengine.StringField()
 
     def complete(self, city, street, state, ibge, gia, district):
         self.city = city
@@ -20,19 +20,4 @@ class Address:
         self.state = state
         self.ibge = ibge
         self.gia = gia
-        self.district = district;
-
-    def template(self):
-        add = {
-            "cep": self.cep,
-            "street": self.street,
-            "complement": self.complement,
-            "number": self.number,
-            "district": self.district,
-            "city": self.city,
-            "state": self.state,
-            "ibge": self.ibge,
-            "gia": self.gia
-        }
-
-        return add
+        self.district = district

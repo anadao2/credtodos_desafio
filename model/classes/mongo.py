@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from pprint import pprint
 
 from pymongo import MongoClient
 
