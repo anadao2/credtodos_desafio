@@ -1,15 +1,11 @@
 import json
-import re
 import urllib
 
 import bson
-import phonenumbers
-from email_validator import validate_email
 
 from model.classes.address import Address
 from model.classes.customer import Customer
 from model.classes.mongo import Mongo
-from model.schema.customer import CustomerSchema
 
 
 def customer_list():
@@ -44,91 +40,6 @@ def bson_to_customer(data):
 def req_to_customer(req_data):
     address = Address(req_data['cep'], req_data['numero'], req_data['complemento'])
     return Customer(req_data['nome'], req_data['email'], req_data['cpf'], address, req_data['telefone'])
-
-
-def save_customer(customer):
-    #validate_customer(customer)
-    db = Mongo()
-    db = db.db
-    wallet = db.wallet
-    x = wallet.insert_one(customer.template())
-
-
-def validate_customer(customer):
-    # NAME
-    if not customer.name:
-        raise Exception('Nome deve ser inserido')
-
-    # EMAIL
-    #if not validate_email(customer.email):
-    #    raise Exception('Email invalido')
-
-    # CPF
-    #if not is_cpf_valid(customer.cpf):
-    #    raise Exception('CPF invalido')
-
-    # PHONE
-    phone = phonenumbers.parse("+55" + customer.phone, None)
-    if not phonenumbers.is_valid_number(phone):
-        raise Exception('Telefone invalido')
-
-    validate_address(customer.address)
-
-
-def is_cpf_valid(cpf):
-    # Check if type is str
-    if not isinstance(cpf, str):
-        return False
-
-    # Remove some unwanted characters
-    cpf = re.sub("[^0-9]", '', cpf)
-
-    # Checks if string has 11 characters
-    if len(cpf) != 11:
-        return False
-
-    sum = 0
-    weight = 10
-
-    for n in range(9):
-        sum = sum + int(cpf[n]) * weight
-
-        # Decrement weight
-        weight = weight - 1
-
-    verifying_digit = 11 - sum % 11
-
-    if verifying_digit > 9:
-        firstverifying_digit = 0
-    else:
-        firstverifying_digit = verifying_digit
-
-    sum = 0
-    weight = 11
-    for n in range(10):
-        sum = sum + int(cpf[n]) * weight
-
-        # Decrement weight
-        weight = weight - 1
-
-    verifying_digit = 11 - sum % 11
-
-    if verifying_digit > 9:
-        secondverifying_digit = 0
-    else:
-        secondverifying_digit = verifying_digit
-
-    if cpf[-2:] == "%s%s" % (firstverifying_digit, secondverifying_digit):
-        return True
-    return False
-
-
-def validate_address(address):
-    # CEP
-    if not address.cep:
-        raise Exception('CEP deve ser inserido')
-
-    autocomplete_address(address)
 
 
 def autocomplete_address(address):
