@@ -3,12 +3,13 @@ import os
 
 import jsonpickle as jsonpickle
 import pymongo
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_api import status
 from flask_httpauth import HTTPTokenAuth
 from marshmallow import ValidationError
 
-from controller.api import customer_list, get_customer_by_email
+from controller.api import customer_list
+from model.classes.customer import Customer
 from model.schema.address import AddressSchema
 from model.schema.customer import CustomerSchema
 
@@ -31,17 +32,17 @@ def verify_token(token):
 @app.route('/api/v1/customers', methods=['GET'])
 @auth.login_required
 def customers():
-    data = ""
+    data = []
     try:
         data = customer_list()
         status_code = status.HTTP_200_OK
 
     except Exception as ex:
         content = {'message': ex.args}
+        print(content)
         status_code = status.HTTP_404_NOT_FOUND
 
-    return json.dumps(json.loads(jsonpickle.encode(data)), indent=4, ensure_ascii=False), status_code, {
-        'ContentType': 'application/json'}
+    return jsonify(CustomerSchema().dump(data, many=True)), status_code, {'ContentType': 'application/json'}
 
 
 @app.route('/api/v1/customer/<email>', methods=['GET'])
@@ -49,15 +50,13 @@ def customers():
 def customer_by_email(email):
     data = ""
     try:
-        data = get_customer_by_email(email)
+        data = Customer.objects(email=email).first()
         status_code = status.HTTP_200_OK
 
     except Exception as ex:
         content = {'message': ex.args}
         status_code = status.HTTP_404_NOT_FOUND
-
-    return json.dumps(json.loads(jsonpickle.encode(data)), indent=4, ensure_ascii=False), status_code, {
-        'ContentType': 'application/json'}
+    return CustomerSchema().dump(data), status_code, {'ContentType': 'application/json'}
 
 
 @app.route('/api/v1/new_customer', methods=['POST'])
@@ -75,12 +74,9 @@ def new_customer():
 
     except ValidationError as err:
         content = {'message': err.messages}
+        print(err)
         status_code = status.HTTP_404_NOT_FOUND
-
-    except pymongo.errors.DuplicateKeyError:
-        content = {'message': 'Email existente'}
-        status_code = status.HTTP_409_CONFLICT
-        # HTTP_500_INTERNAL_SERVER_ERROR
+        #status_code = status.HTTP_409_CONFLICT
 
     return json.dumps(content), status_code, {'ContentType': 'application/json'}
 

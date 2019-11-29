@@ -2,7 +2,6 @@ import re
 
 import phonenumbers
 from marshmallow import Schema, fields, validates, ValidationError, EXCLUDE, post_load
-from marshmallow import pprint
 
 from model.classes.customer import Customer
 
@@ -15,30 +14,34 @@ class CustomerSchema(Schema):
     def make_customer(self, data, **kwargs):
         return Customer(**data)
 
-    name = fields.Str(required=True, error_messages={"required": "Nome deve ser inserido."})
-    email = fields.Email(required=True, error_messages={"required": "Email deve ser inserido."})
-    cpf = fields.Str(required=True, error_messages={"required": "CPF deve ser inserido."})
-    phone = fields.Str(required=True, error_messages={"required": "Telefone deve ser inserido."})
+    name = fields.Str()
+    email = fields.Str()
+    cpf = fields.Str()
+    phone = fields.Str()
 
     @validates("cpf")
     def validate_cpf(self, value):
+        print(value)
         if not self.is_cpf_valid(value):
             raise ValidationError("CPF invalido")
 
     @validates("phone")
     def validate_phone(self, value):
+        print(value)
         phone = phonenumbers.parse("+55" + value, None)
         if not phonenumbers.is_valid_number(phone):
             raise ValidationError("Telefone invalido")
 
-    CustomerSchema = Schema.from_dict(
-        {"name": fields.Str(), "email": fields.Email(), "cpf": fields.Str(), "phone": fields.Str()}
-    )
+    @validates("email")
+    def validate_email(self, value):
+        print(value)
+        customer = Customer.objects(email=value).first()
+        if not customer == None:
+            raise ValidationError("Email existente")
 
-    def test_json(self, customer):
-        schema = CustomerSchema()
-        result = schema.dump(customer)
-        pprint(result)
+    CustomerSchema = Schema.from_dict(
+        {"name": fields.Str(), "email": fields.Str(), "cpf": fields.Str(), "phone": fields.Str()}
+    )
 
     def is_cpf_valid(self, cpf):
         # Check if type is str

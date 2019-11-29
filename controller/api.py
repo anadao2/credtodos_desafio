@@ -9,21 +9,12 @@ from model.classes.mongo import Mongo
 
 
 def customer_list():
-    db = Mongo()
-    db = db.db
-    wallet = db.wallet
     list = []
-    for data in wallet.find():
-        list.append(bson_to_customer(data))
+    for customer in Customer.objects:
+        print(customer)
+        list.append(customer)
 
     return list
-
-
-def get_customer_by_email(email):
-    db = Mongo()
-    db = db.db
-    data = db.wallet.find_one({"_id": email})
-    return bson_to_customer(data)
 
 
 def bson_to_customer(data):
@@ -32,14 +23,14 @@ def bson_to_customer(data):
                       decoded_doc['address']['complement'])
     address.complete(decoded_doc['address']['city'], decoded_doc['address']['street'], decoded_doc['address']['state'],
                      decoded_doc['address']['ibge'], decoded_doc['address']['gia'], decoded_doc['address']['district'])
-    customer = Customer(decoded_doc['name'], decoded_doc['_id'], decoded_doc['cpf'], address,
-                        decoded_doc['phone'])
+    customer = model.classes.customer.Customer(decoded_doc['name'], decoded_doc['_id'], decoded_doc['cpf'], address,
+                                               decoded_doc['phone'])
     return customer
 
 
 def req_to_customer(req_data):
     address = Address(req_data['cep'], req_data['numero'], req_data['complemento'])
-    return Customer(req_data['nome'], req_data['email'], req_data['cpf'], address, req_data['telefone'])
+    return model.classes.customer.Customer(req_data['nome'], req_data['email'], req_data['cpf'], address, req_data['telefone'])
 
 
 def autocomplete_address(address):

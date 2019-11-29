@@ -30,8 +30,3 @@ class AddressSchema(Schema):
     AddressSchema = Schema.from_dict(
         {"cep": fields.Str(), "complement": fields.Email(), "number": fields.Int()}
     )
-
-    def test_json(self, address):
-        schema = AddressSchema()
-        result = schema.dump(address)
-        pprint(result)
