@@ -17,13 +17,6 @@ Rodam pela interface do PyCharm e também pelo comando:
 
 
 Testes via CURL:
-  - curl -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" -d '{"nome":"Bla", "email":"bla@gmail.com", "cpf":"512.825.840-81", "cep":"13710000", "numero":"185","complemento":"Bloco 7, apto 115","telefone":"16982487578"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/api/v1/new_customer
+  - curl -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" -d '{"name":"Bla", "email":"bla@gmail.com", "cpf":"512.825.840-81", "cep":"005541030", "number":"185","complement":"Bloco 7, apto 115","phone":"16982487578"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/api/v1/new_customer
   - curl -H 'Accept: application/json' -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" http://127.0.0.1:5000/api/v1/customers
   - curl -H 'Accept: application/json' -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" http://127.0.0.1:5000/api/v1/customer/bla@gmail.com
-
-  curl -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" -d '{"name":"Bla", "email":"bla@gmail.com", "cpf":"512.825.840-81", "cep":"13710000", "number":"185","complement":"Bloco 7, apto 115","phone":"16982487578"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/api/v1/new_customer
-
-
-  curl -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" -d '{"name":"Bla", "email":"bla@gmail.com", "cpf":" 512.825.840-81", "cep":"05541030", "number":"185","complement":"Bloco 7, apto 115","phone":"16982487578"}' -H "Content- Type: application/json" -X POST http://127.0.0.1:5000/api/v1/new_customer
-
-curl -H "Authorization: Token ac5f34261aaa980f75f5571a6439f6a0" -d '{"name":"Bla", "email":"bla@gmail.com", "cpf":"512.825.840-81", "cep":"13710000", "number":"185","complement":"Bloco 7, apto 115","phone":"16982487578"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/api/v1/new_customer
