@@ -1,6 +1,5 @@
 import urllib
-from pprint import pprint
-
+from jsonpickle import json
 from marshmallow import Schema, fields, validates, ValidationError, EXCLUDE, post_load
 
 from model.classes.address import Address
@@ -30,3 +29,14 @@ class AddressSchema(Schema):
     AddressSchema = Schema.from_dict(
         {"cep": fields.Str(), "complement": fields.Email(), "number": fields.Int()}
     )
+
+    @classmethod
+    def complete(self, address):
+        with urllib.request.urlopen("https://viacep.com.br/ws/" + address.cep + "/json") as url:
+            data = json.loads(url.read().decode())
+            address.city = data['localidade']
+            address.district = data['bairro']
+            address.state = data['uf']
+            address.street = data['logradouro']
+            address.ibge = data['ibge']
+            address.gia = data['gia']

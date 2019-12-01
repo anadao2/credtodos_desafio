@@ -2,8 +2,10 @@ import re
 
 import phonenumbers
 from marshmallow import Schema, fields, validates, ValidationError, EXCLUDE, post_load
+from marshmallow.fields import Nested
 
 from model.classes.customer import Customer
+from model.schema.address import AddressSchema
 
 
 class CustomerSchema(Schema):
@@ -18,29 +20,27 @@ class CustomerSchema(Schema):
     email = fields.Str()
     cpf = fields.Str()
     phone = fields.Str()
+    address = Nested(AddressSchema)
 
     @validates("cpf")
     def validate_cpf(self, value):
-        print(value)
         if not self.is_cpf_valid(value):
             raise ValidationError("CPF invalido")
 
     @validates("phone")
     def validate_phone(self, value):
-        print(value)
         phone = phonenumbers.parse("+55" + value, None)
         if not phonenumbers.is_valid_number(phone):
             raise ValidationError("Telefone invalido")
 
     @validates("email")
     def validate_email(self, value):
-        print(value)
         customer = Customer.objects(email=value).first()
         if not customer == None:
-            raise ValidationError("Email existente")
+            raise ValidationError("Email existente", ['email'])
 
     CustomerSchema = Schema.from_dict(
-        {"name": fields.Str(), "email": fields.Str(), "cpf": fields.Str(), "phone": fields.Str()}
+        {"name": fields.Str(), "email": fields.Str(), "cpf": fields.Str(), "phone": fields.Str(), "address": Nested(AddressSchema)}
     )
 
     def is_cpf_valid(self, cpf):
