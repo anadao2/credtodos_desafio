@@ -1,14 +1,11 @@
 import json
 import os
 
-import jsonpickle as jsonpickle
-import pymongo
 from flask import Flask, request, jsonify
 from flask_api import status
 from flask_httpauth import HTTPTokenAuth
 from marshmallow import ValidationError
 
-from controller.api import customer_list
 from model.classes.customer import Customer
 from model.schema.address import AddressSchema
 from model.schema.customer import CustomerSchema
@@ -32,17 +29,17 @@ def verify_token(token):
 @app.route('/api/v1/customers', methods=['GET'])
 @auth.login_required
 def customers():
-    data = []
+    list = []
     try:
-        data = customer_list()
+        for customer in Customer.objects:
+            list.append(customer)
+
         status_code = status.HTTP_200_OK
 
     except Exception as ex:
-        content = {'message': ex.args}
-        print(content)
         status_code = status.HTTP_404_NOT_FOUND
 
-    return jsonify(CustomerSchema().dump(data, many=True)), status_code, {'ContentType': 'application/json'}
+    return jsonify(CustomerSchema().dump(list, many=True)), status_code, {'ContentType': 'application/json'}
 
 
 @app.route('/api/v1/customer/<email>', methods=['GET'])
@@ -67,6 +64,7 @@ def new_customer():
     try:
         customer = CustomerSchema().load(request.get_json())
         address = AddressSchema().load(request.get_json())
+        AddressSchema.complete(address)
         customer.address = address
         customer.save()
         content = {'message': 'Cadastrado com sucesso'}
