@@ -1,20 +1,27 @@
+import configparser
 import json
-import os
 
 from flask import Flask, request, jsonify
 from flask_api import status
 from flask_httpauth import HTTPTokenAuth
 from marshmallow import ValidationError
+from mongoengine import connect
 
-from model.classes.customer import Customer
+from model.exception.conflict_error import ValidationConflictError
 from model.schema.address import AddressSchema
 from model.schema.customer import CustomerSchema
 
 app = Flask(__name__)
 auth = HTTPTokenAuth(scheme='Token')
 
+config = configparser.ConfigParser()
+config.read('conf.ini')
+
+connect('credtodos', host=config['DEFAULT']['DB_HOST'], port=int(config['DEFAULT']['DB_PORT']))
+
+from model.classes.customer import Customer
 tokens = {
-    "ac5f34261aaa980f75f5571a6439f6a0": "credtodos_backend"
+    config['DEFAULT']['Token']: "credtodos_backend"
 }
 
 
@@ -46,13 +53,18 @@ def customers():
 @auth.login_required
 def customer_by_email(email):
     data = ""
+    status_code = ""
     try:
-        data = Customer.objects(email=email).first()
-        status_code = status.HTTP_200_OK
+        customer = Customer.objects(email=email).first()
+        if customer == None:
+            status_code = status.HTTP_404_NOT_FOUND
+        else:
+            status_code = status.HTTP_200_OK
+            data = customer
 
     except Exception as ex:
         content = {'message': ex.args}
-        status_code = status.HTTP_404_NOT_FOUND
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     return CustomerSchema().dump(data), status_code, {'ContentType': 'application/json'}
 
 
@@ -72,13 +84,15 @@ def new_customer():
 
     except ValidationError as err:
         content = {'message': err.messages}
-        print(err)
         status_code = status.HTTP_404_NOT_FOUND
-        #status_code = status.HTTP_409_CONFLICT
+
+    except ValidationConflictError as err:
+        content = {'message': err.messages}
+        status_code = status.HTTP_409_CONFLICT
 
     return json.dumps(content), status_code, {'ContentType': 'application/json'}
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='127.0.0.1', port=port)
+    port = int(config['DEFAULT']['PORT'])
+    app.run(host=config['DEFAULT']['HOST'], port=port)

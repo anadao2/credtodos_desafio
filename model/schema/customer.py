@@ -5,6 +5,7 @@ from marshmallow import Schema, fields, validates, ValidationError, EXCLUDE, pos
 from marshmallow.fields import Nested
 
 from model.classes.customer import Customer
+from model.exception.conflict_error import ValidationConflictError
 from model.schema.address import AddressSchema
 
 
@@ -16,10 +17,10 @@ class CustomerSchema(Schema):
     def make_customer(self, data, **kwargs):
         return Customer(**data)
 
-    name = fields.Str()
-    email = fields.Str()
-    cpf = fields.Str()
-    phone = fields.Str()
+    name = fields.Str(required=True, error_messages={"required": "Nome deve ser inserido."})
+    email = fields.Email(required=True, error_messages={"required": "Email deve ser inserido."})
+    cpf = fields.Str(required=True, error_messages={"required": "CPF deve ser inserido."})
+    phone = fields.Str(required=True, error_messages={"required": "Telefone deve ser inserido."})
     address = Nested(AddressSchema)
 
     @validates("cpf")
@@ -37,7 +38,7 @@ class CustomerSchema(Schema):
     def validate_email(self, value):
         customer = Customer.objects(email=value).first()
         if not customer == None:
-            raise ValidationError("Email existente", ['email'])
+            raise ValidationConflictError(message="Email existente")
 
     CustomerSchema = Schema.from_dict(
         {"name": fields.Str(), "email": fields.Str(), "cpf": fields.Str(), "phone": fields.Str(), "address": Nested(AddressSchema)}
