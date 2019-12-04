@@ -17,11 +17,11 @@ auth = HTTPTokenAuth(scheme='Token')
 config = configparser.ConfigParser()
 config.read('conf.ini')
 
-connect('credtodos', host=config['DEFAULT']['DB_HOST'], port=int(config['DEFAULT']['DB_PORT']))
+connect(config['DEFAULT']['DATABASE'], host=config['DEFAULT']['DB_HOST'], port=int(config['DEFAULT']['DB_PORT']))
 
 from model.classes.customer import Customer
 tokens = {
-    config['DEFAULT']['Token']: "credtodos_backend"
+    config['DEFAULT']['TOKEN']: "credtodos_backend"
 }
 
 
@@ -95,4 +95,4 @@ def new_customer():
 
 if __name__ == '__main__':
     port = int(config['DEFAULT']['PORT'])
-    app.run(host=config['DEFAULT']['HOST'], port=port)
+    app.run(debug=True, host=config['DEFAULT']['HOST'], port=port)

@@ -1,23 +1,23 @@
 import configparser
 import json
+import os
+import sys
 import unittest
 
 import requests
-import os, sys
-
-from mongoengine import connect
 
 BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(BASE_PATH)
 
+from mongoengine import connect
+
+connect('credtodos', host='localhost', port=int(27017))
+from model.classes.customer import Customer
+
 config = configparser.ConfigParser()
 config.read('../../conf.ini')
 
-connect('credtodos', host=config['DEFAULT']['DB_HOST'], port=int(config['DEFAULT']['DB_PORT']))
-from model.classes.customer import Customer
-
-HOST = 'http://' + config['DEFAULT']['HOST'] + ':' + config['DEFAULT']['PORT']
-print(HOST)
+HOST = 'http://localhost:5000'
 TOKEN = 'Token ac5f34261aaa980f75f5571a6439f6a0'
 
 

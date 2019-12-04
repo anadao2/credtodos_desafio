@@ -1,8 +1,12 @@
+import configparser
 import urllib
 from jsonpickle import json
 from marshmallow import Schema, fields, validates, ValidationError, EXCLUDE, post_load
 
 from model.classes.address import Address
+
+config = configparser.ConfigParser()
+config.read('conf.ini')
 
 
 class AddressSchema(Schema):
@@ -20,7 +24,7 @@ class AddressSchema(Schema):
     @validates("cep")
     def validate_cep(self, value):
 
-        req = urllib.request.Request("https://viacep.com.br/ws/" + value + "/json")
+        req = urllib.request.Request(config['DEFAULT']['CEP_API'] + value + "/json")
         try:
             url = urllib.request.urlopen(req)
         except urllib.error.HTTPError as e:
@@ -32,7 +36,7 @@ class AddressSchema(Schema):
 
     @classmethod
     def complete(self, address):
-        with urllib.request.urlopen("https://viacep.com.br/ws/" + address.cep + "/json") as url:
+        with urllib.request.urlopen(config['DEFAULT']['CEP_API'] + address.cep + "/json") as url:
             data = json.loads(url.read().decode())
             address.city = data['localidade']
             address.district = data['bairro']

@@ -45,14 +45,11 @@ class CustomerSchema(Schema):
     )
 
     def is_cpf_valid(self, cpf):
-        # Check if type is str
         if not isinstance(cpf, str):
             return False
 
-        # Remove some unwanted characters
         cpf = re.sub("[^0-9]", '', cpf)
 
-        # Checks if string has 11 characters
         if len(cpf) != 11:
             return False
 
@@ -62,7 +59,6 @@ class CustomerSchema(Schema):
         for n in range(9):
             sum = sum + int(cpf[n]) * weight
 
-            # Decrement weight
             weight = weight - 1
 
         verifying_digit = 11 - sum % 11
@@ -77,7 +73,6 @@ class CustomerSchema(Schema):
         for n in range(10):
             sum = sum + int(cpf[n]) * weight
 
-            # Decrement weight
             weight = weight - 1
 
         verifying_digit = 11 - sum % 11

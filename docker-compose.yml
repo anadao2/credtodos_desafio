@@ -1,0 +1,32 @@
+version: '3'
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - "/home/open/mymongo:/data/db"
+    networks:
+      credtodos-network:
+        ipv4_address: 192.168.15.22
+
+  web:
+    build: .
+  #  command: python /usr/src/app/__main__.py
+    depends_on:
+      - mongodb
+    ports:
+     - 5000:5000
+    volumes:
+      - .:/usr/src/app
+    networks:
+      credtodos-network:
+        ipv4_address: 192.168.15.21
+    #tty: true
+
+networks:
+  credtodos-network:
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.15.0/24"
