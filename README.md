@@ -1,4 +1,4 @@
-### Descrição do projeto:
+### Descrição do projeto
 
 O projeto consiste em uma API, simples e com autenticação, para cadastrar lista
 
@@ -34,7 +34,7 @@ O projeto consiste em uma API, simples e com autenticação, para cadastrar list
 
 
 
-### Passos de instalação e execução do projeto:
+### Passos de instalação e execução do projeto
 
 - Instalar o Docker no link https://docs.docker.com/v17.09/get-started/;
 
